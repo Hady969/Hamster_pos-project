@@ -1,0 +1,13 @@
+**/target/
+**/.idea/
+**/*.iml
+**/.vscode/
+**/.classpath
+**/.project
+**/.settings/
+**/*.log
+**/.DS_Store
+**/out/
+.env
+*.env
+!*.env.example
