@@ -1,0 +1,68 @@
+### Health checks
+GET http://localhost:8081/actuator/health
+GET http://localhost:8080/actuator/health
+
+### 1) Create a product
+# @name createProduct
+POST http://localhost:8081/api/products
+Content-Type: application/json
+X-Correlation-Id: demo-corr-1
+
+{
+  "name": "Espresso Beans 1kg",
+  "price": 24.50,
+  "availableQuantity": 10
+}
+
+### 2) Place an order (use product id from previous response)
+# @name placeOrder
+POST http://localhost:8080/api/orders
+Content-Type: application/json
+Idempotency-Key: order-demo-001
+X-Correlation-Id: demo-corr-2
+
+{
+  "customerEmail": "customer@example.com",
+  "items": [
+    {
+      "productId": "{{createProduct.response.body.id}}",
+      "quantity": 2
+    }
+  ]
+}
+
+### 3) Retrieve the order
+GET http://localhost:8080/api/orders/{{placeOrder.response.body.id}}
+X-Correlation-Id: demo-corr-3
+
+### Idempotent replay (same key + same body) → returns existing order
+POST http://localhost:8080/api/orders
+Content-Type: application/json
+Idempotency-Key: order-demo-001
+X-Correlation-Id: demo-corr-4
+
+{
+  "customerEmail": "customer@example.com",
+  "items": [
+    {
+      "productId": "{{createProduct.response.body.id}}",
+      "quantity": 2
+    }
+  ]
+}
+
+### Idempotency conflict (same key + different body) → 409
+POST http://localhost:8080/api/orders
+Content-Type: application/json
+Idempotency-Key: order-demo-001
+X-Correlation-Id: demo-corr-5
+
+{
+  "customerEmail": "other@example.com",
+  "items": [
+    {
+      "productId": "{{createProduct.response.body.id}}",
+      "quantity": 1
+    }
+  ]
+}
