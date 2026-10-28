@@ -1,0 +1,16 @@
+order:
+  reconciliation:
+    fixed-delay-ms: 3600000
+    pending-age: 1s
+    batch-size: 50
+
+inventory:
+  connect-timeout: 1s
+  read-timeout: 1s
+  max-attempts: 2
+  retry-backoff: 50ms
+
+logging:
+  level:
+    root: WARN
+    com.vidopos: INFO
